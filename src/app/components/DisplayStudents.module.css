@@ -1,0 +1,19 @@
+.form {
+    justify-content: center;
+    margin: 10px;
+    align-items: center;
+}
+
+.label {
+    font-size: 20px;
+    font-weight: 300;
+    margin-right: 16px;
+}
+
+.input {
+    min-width: 300px;
+}
+
+.select {
+    min-width: 150px;
+}

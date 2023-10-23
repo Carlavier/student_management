@@ -1,0 +1,27 @@
+.title {
+    font-size: 30px;
+    text-align: center;
+    margin: 20px;
+}
+
+.form {
+    text-align: center;
+    margin: 10px;
+}
+
+.field {
+    width: 220px;
+    max-width: 220px;
+    float: right;
+}
+
+.submitButton {
+    font-size: 20px;
+    padding: 0px 70px;
+    margin-top: 10px;
+    height: 40px;
+}
+
+.submitButton:only-child {
+    color: red;
+}
