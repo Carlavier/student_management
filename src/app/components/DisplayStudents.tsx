@@ -1,27 +1,23 @@
-import { Table, Form, Input, Select } from "antd";
-import { useGetStudentsQuery } from "../redux/student.service";
-import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "antd/es/form/Form";
-import { useEffect } from "react";
-
-import { RootState } from "../redux/store";
-import { initStudents } from "../redux/students.slice";
-
+import { Button, Table, Input } from "antd";
+import { useDeleteStudentMutation, useGetStudentsQuery } from "../redux/student.service";
 import style from "./DisplayStudents.module.css";
-
-interface Filter {
-    targetString?: string
-    targetColumn?: string
-}
-
-type StudentInfoIndex = 'name' | 'dateOfBirth' | 'studentGroup' | 'avatar';
+import { useDispatch } from "react-redux";
+import { setButtonContent, setFormData } from "../redux/addStudentForm.slice";
+import { useState } from "react";
 
 function DisplayStudents() {
+    const [search, setSearch] = useState('');
+    const { data: students } = useGetStudentsQuery(search);
+    const [ deleteStudent ] = useDeleteStudentMutation();
+    const dispatch = useDispatch();
+
+
     const column = [
         {
+            width: '1%',
             title: 'Avatar',
             dataIndex: 'avatar',
-            render: (url: string) => <img src={url} />,
+            render: (url: string) => <img src={url} className={style.avatarImage} />,
             key: 'avatar',
         },
         {
@@ -40,43 +36,53 @@ function DisplayStudents() {
             dataIndex: 'studentGroup',
             key: 'studentGroup',
         },
+        {
+            width: '1%',
+            key: 'editButton',
+            dataIndex: 'id',
+            render(id: string) {
+                return (
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            const student = students?.find((student) => student.id === id);
+                            console.log(student);
+                            dispatch(setFormData(student));
+                            dispatch(setButtonContent('Edit'));
+                        }}
+                    >Edit</Button>
+                );
+            }
+        },
+        {
+            width: '1%',
+            key: 'deleteButton',
+            dataIndex: 'id',
+            render(id: string) {
+                return (
+                    <Button 
+                        type="primary" 
+                        danger
+                        onClick={() => {
+                            deleteStudent(id);
+                            // .then((res) => console.log(res));
+                        }}
+                    >Delete</Button>
+                );
+            }
+        },
     ];
-
-    const [form] = useForm();
-    const dispatch = useDispatch();
-    // const { students } = useSelector((state: RootState) => state.students);
-    const { data: students } = useGetStudentsQuery();
-    // dispatch(initStudents(data)); // NEED FIX ASAP
-
-    // if (isLoading) return (<div>isloading...</div>);
-
-    useEffect(() => {}, [form.getFieldValue('targetString'), form.getFieldValue('targetColumn')])
 
     return (
         <div>
-            <Form layout="inline" className={style.form} form={form}>
-                <div className={style.label}>Filter:</div>
-                <Form.Item<Filter>
-                    name="targetString"
-                >
-                    <Input className={style.input}/>
-                </Form.Item>
-                <Form.Item<Filter>
-                    name="targetColumn"
-                >
-                    <Select className={style.select}>
-                        {column.map((item) => (
-                            <Select.Option value={item.dataIndex}>{item.title}</Select.Option>
-                        ))}
-                    </Select>
-                </Form.Item>
-            </Form>
+            <Input
+                style={{margin: 10, padding: 10}}
+                placeholder="Enter name to filter"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
             <Table 
-                dataSource={
-                    (form.getFieldValue('targetString') && form.getFieldValue('targetColumn')) ?
-                    students?.filter((student) => student[form.getFieldValue('targetColumn') as StudentInfoIndex].includes(form.getFieldValue('targetString') as string))
-                    : students
-                } 
+                dataSource={students} 
                 columns={column} rowKey="id"
             />
         </div>
