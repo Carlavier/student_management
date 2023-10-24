@@ -37,7 +37,7 @@ export const studentApi = createApi({
                 url: `students/${id}`,
                 method: "DELETE",
             }),
-            invalidatesTags(result, error, id) {
+            invalidatesTags(_result, _error, id) {
                 return [{type: 'Students', id: id}];
             }
         }),
@@ -47,7 +47,7 @@ export const studentApi = createApi({
                 method: 'PUT',
                 body: student,
             }),
-            invalidatesTags(result, error, { id }) {
+            invalidatesTags(_result, _error, { id }) {
                 return [{type: 'Students', id: id}];
             }
         }),
